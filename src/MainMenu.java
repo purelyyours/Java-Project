@@ -36,26 +36,49 @@ public class MainMenu {
     }
 
     private static void findRooms() throws Exception {
-        System.out.print("Check-in date (dd/MM/yyyy): ");
-        Date checkIn = sdf.parse(scanner.nextLine());
+    System.out.print("Check-in date (dd/MM/yyyy): ");
+    Date checkIn = sdf.parse(scanner.nextLine());
 
-        System.out.print("Check-out date (dd/MM/yyyy): ");
-        Date checkOut = sdf.parse(scanner.nextLine());
+    System.out.print("Check-out date (dd/MM/yyyy): ");
+    Date checkOut = sdf.parse(scanner.nextLine());
 
-        Collection<Room> rooms =
-                HotelResource.findRoom(checkIn, checkOut);
+    Collection<Room> rooms =
+            HotelResource.findRoom(checkIn, checkOut);
 
-        if (rooms.isEmpty()) {
-            System.out.println("No rooms available.");
-            System.out.println("Recommended rooms:");
+    if (rooms.isEmpty()) {
+        System.out.println("No rooms available.");
+        System.out.println("Recommended rooms:");
+        HotelResource.findRecommendedRooms(checkIn, checkOut)
+                .forEach(System.out::println);
+        return;
+    }
 
-            HotelResource.findRecommendedRooms(
-                            checkIn, checkOut)
-                    .forEach(System.out::println);
-        } else {
-            rooms.forEach(System.out::println);
+    System.out.println("Available rooms:");
+    rooms.forEach(System.out::println);
+
+    System.out.print("Enter room number to book: ");
+    String roomNumber = scanner.nextLine();
+
+    Room selectedRoom = null;
+    for (Room room : rooms) {
+        if (room.getRoomNumber().equals(roomNumber)) {
+            selectedRoom = room;
+            break;
         }
     }
+
+    if (selectedRoom == null) {
+        System.out.println("Invalid room selection.");
+        return;
+    }
+
+    System.out.print("Enter your email: ");
+    String email = scanner.nextLine();
+
+    HotelResource.bookRoom(email, selectedRoom, checkIn, checkOut);
+    System.out.println("Room successfully booked!");
+}
+
 
     private static void seeReservations() {
         System.out.print("Email: ");
@@ -79,3 +102,4 @@ public class MainMenu {
         System.out.println("Account created.");
     }
 }
+
